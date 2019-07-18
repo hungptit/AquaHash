@@ -161,6 +161,12 @@ Timer resolution: 0.001000 us
 Completed in 00:01:04.776061
 ```
 
+### Analysis ###
+
+* aquahash, xxhash, and sha1num are slightly faster than md5sum for small files i.e < 4Kb.
+* aquahash and xxhsum commands are much faster than other commands as the file size is increased.. 
+* aquahash is 10x faster than md5sum command and it is about 25% faster than xxhsum for a large file i.e 263Mb.
+
 # Analysis #
 
 ## Usability ##

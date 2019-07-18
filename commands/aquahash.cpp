@@ -89,7 +89,7 @@ namespace {
 
     void compute(const InputParams &params) {
         for (auto &file : params.files) {
-            aquahash::FileReader<aquahash::ComputeHashPolicy> hasher;
+            aquahash::FileReader<aquahash::AquaHashPolicy> hasher;
             hasher(file.data());
         };
     }

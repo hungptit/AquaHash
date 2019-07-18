@@ -14,36 +14,43 @@
 
 #pragma once
 
-#include <aquahash.h>
+#define XXH_INLINE_ALL
+#include "xxhash.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <utils.h>
+#include <params.h>
+
+#define XXHSUM64_DEFAULT_SEED 0
 
 namespace aquahash {
-    template <typename Params> class XXHashPolicy {
+    class XXHashWriter {
+      private:
+        char buffer[16];
+
+      public:
+        const char *operator()(U64 value) {
+            alignas(16) uint8_t v[8];
+            memcpy(v, &value, sizeof(U64));
+            sprintf(buffer, "%02x%02x%02x%02x%02x%02x%02x%02x", v[0], v[1], v[2], v[3], v[4], v[5], v[6],
+                    v[7]);
+            return buffer;
+        }
+    };
+
+    class XXHashPolicy {
       public:
         static constexpr size_t BUFFER_SIZE = 1 << 16;
-        XXHashPolicy(Params &&args)
-            : count(0),
-              seed(_mm_setzero_si128()),
-              hashcode(seed),
-              aqua(seed),
-              writer(),
-              params(std::forward<Params>(args)) {}
+        XXHashPolicy(const Params &args) : writer(), params(args) {
+            (void)XXH64_reset(&state64, XXHSUM64_DEFAULT_SEED);
+        }
 
         /* Update the hash code */
-        void process(const char *buffer, const size_t len) {
-            ++count;
-            if ((len < BUFFER_SIZE) && (count == 1)) {
-                hashcode = AquaHash::Hash(reinterpret_cast<const uint8_t *>(buffer), len, seed);
-                return;
-            }
-            aqua.Update(reinterpret_cast<const uint8_t *>(buffer), len);
-        }
+        void process(const char *buffer, const size_t len) { (void)XXH64_update(&state64, buffer, len); }
 
         /* Finalize the process and return the hash string. */
         void finalize(const std::string &filename) {
-            if (count > 1) hashcode = aqua.Finalize();
+            U64 const hashcode = XXH64_digest(&state64);
             if (params.color()) {
                 printf("\033[1;32m%s\033[0m  \033[1;34m%s\033[0m\n", writer(hashcode), filename.data());
             } else {
@@ -52,11 +59,8 @@ namespace aquahash {
         }
 
       private:
-        size_t count;
-        __m128i seed;
-        __m128i hashcode;
-        AquaHash aqua;
-        HashCodeWriter writer;
+        XXH64_state_t state64;
+        XXHashWriter writer;
         Params params;
     };
 } // namespace aquahash

@@ -35,10 +35,10 @@ add_cxx_compiler_flag(-march=native)
 # Enable other flags
 add_cxx_compiler_flag(-std=c++14)
 add_cxx_compiler_flag(-Wall)
-add_cxx_compiler_flag(-pedantic)
-add_cxx_compiler_flag(-pedantic-errors)
+# add_cxx_compiler_flag(-pedantic)
+# add_cxx_compiler_flag(-pedantic-errors)
 add_cxx_compiler_flag(-fstrict-aliasing)
-# add_cxx_compiler_flag(-fsanitize=address)
+add_cxx_compiler_flag(-fsanitize=address)
 
 if (HAVE_CXX_FLAG_FSTRICT_ALIASING)
   add_cxx_compiler_flag(-Wstrict-aliasing)
@@ -61,6 +61,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Include folders
 include_directories ("${EXTERNAL_DIR}/include")
+include_directories ("${EXTERNAL_DIR}/src/xxHash")
 include_directories ("${SRC_DIR}")
 
 # Unittests

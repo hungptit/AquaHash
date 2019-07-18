@@ -22,6 +22,10 @@ BENCHMARK(small_file, aquahash, number_of_samples, number_of_operations) {
     ::run("../commands/aquahash", small_file);
 }
 
+BENCHMARK(small_file, aquahash_xxhash, number_of_samples, number_of_operations) {
+    ::run("../commands/aquahash --xxhash ", small_file);
+}
+
 BENCHMARK(small_file, xxhash, number_of_samples, number_of_operations) {
     ::run("../3p/bin/xxhsum", small_file);
 }
@@ -51,6 +55,10 @@ BENCHMARK(mid_file, aquahash, number_of_samples, number_of_operations) {
     ::run("../commands/aquahash", mid_file);
 }
 
+BENCHMARK(mid_file, aquahash_xxhash, number_of_samples, number_of_operations) {
+    ::run("../commands/aquahash --xxhash ", mid_file);
+}
+
 BENCHMARK(mid_file, xxhash, number_of_samples, number_of_operations) {
     ::run("../3p/bin/xxhsum", mid_file);
 }
@@ -72,6 +80,10 @@ BASELINE(large_file, md5sum, number_of_samples, number_of_operations) { ::run("m
 
 BENCHMARK(large_file, aquahash, number_of_samples, number_of_operations) {
     ::run("../commands/aquahash", large_file);
+}
+
+BENCHMARK(large_file, aquahash_xxhash, number_of_samples, number_of_operations) {
+    ::run("../commands/aquahash --xxhash ", large_file);
 }
 
 BENCHMARK(large_file, xxhash, number_of_samples, number_of_operations) {

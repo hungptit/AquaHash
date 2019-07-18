@@ -20,10 +20,16 @@
 #include <utils.h>
 
 namespace aquahash {
-    class AquaHashPolicy {
+    template <typename Params> class AquaHashPolicy {
       public:
         static constexpr size_t BUFFER_SIZE = 1 << 16;
-        AquaHashPolicy() : count(0), seed(_mm_setzero_si128()), hashcode(seed), aqua(seed), writer() {}
+        AquaHashPolicy(Params &&args)
+            : count(0),
+              seed(_mm_setzero_si128()),
+              hashcode(seed),
+              aqua(seed),
+              writer(),
+              params(std::forward<Params>(args)) {}
 
         /* Update the hash code */
         void process(const char *buffer, const size_t len) {
@@ -38,36 +44,11 @@ namespace aquahash {
         /* Finalize the process and return the hash string. */
         void finalize(const std::string &filename) {
             if (count > 1) hashcode = aqua.Finalize();
-            printf("%s  %s\n", writer(hashcode), filename.data());
-        }
-
-      private:
-        size_t count;
-        __m128i seed;
-        __m128i hashcode;
-        AquaHash aqua;
-        HashCodeWriter writer;
-    };
-
-    class XXHashPolicy {
-      public:
-        static constexpr size_t BUFFER_SIZE = 1 << 16;
-        XXHashPolicy() : count(0), seed(_mm_setzero_si128()), hashcode(seed), aqua(seed), writer() {}
-
-        /* Update the hash code */
-        void process(const char *buffer, const size_t len) {
-            ++count;
-            if ((len < BUFFER_SIZE) && (count == 1)) {
-                hashcode = AquaHash::Hash(reinterpret_cast<const uint8_t *>(buffer), len, seed);
-                return;
+            if (params.color()) {
+                printf("\033[1;32m%s\033[0m  \033[1;34m%s\033[0m\n", writer(hashcode), filename.data());
+            } else {
+                printf("%s  %s\n", writer(hashcode), filename.data());
             }
-            aqua.Update(reinterpret_cast<const uint8_t *>(buffer), len);
-        }
-
-        /* Finalize the process and return the hash string. */
-        void finalize(const std::string &filename) {
-            if (count > 1) hashcode = aqua.Finalize();
-            printf("%s  %s\n", writer(hashcode), filename.data());
         }
 
       private:
@@ -76,5 +57,6 @@ namespace aquahash {
         __m128i hashcode;
         AquaHash aqua;
         HashCodeWriter writer;
+        Params params;
     };
 } // namespace aquahash

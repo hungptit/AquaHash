@@ -1,6 +1,7 @@
 PROJECT(unittests)
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
+set(CMAKE_INSTALL_PREFIX "$ENV{HOME}")
 set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 set(EXTERNAL_DIR "${ROOT_DIR}/3p")
 set(SRC_DIR "${ROOT_DIR}/src")
@@ -76,3 +77,4 @@ foreach (src_file ${SRC_FILES})
   TARGET_LINK_LIBRARIES(${src_file})
   ADD_TEST(${src_file} ./${src_file})
 endforeach (src_file)
+INSTALL_PROGRAMS("/bin/" FILES ${SRC_FILES})
